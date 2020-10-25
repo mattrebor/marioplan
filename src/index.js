@@ -13,7 +13,7 @@ import {reduxFirestore} from 'redux-firestore';
 import { getFirebase } from 'react-redux-firebase';
 import {ReactReduxFirebaseProvider} from 'react-redux-firebase';
 import {createFirestoreInstance} from 'redux-firestore'
-//import { initializeApp } from 'firebase';
+import {connect} from 'react-redux';
 
 import firebase from './config/fbConfig';
 
@@ -37,12 +37,30 @@ const rrfProps = {
   createFirestoreInstance
 }
 
+const mapStateToProps = (state) => {
+  return {
+    authIsLoaded: state.firebase.auth && state.firebase.auth.isLoaded
+  }
+}
+
+const WaitTillAuth = connect(mapStateToProps)(({authIsLoaded}) => {
+  if (!authIsLoaded) {
+    return (
+      <div className="center">loading...</div>
+    )
+  }
+  else {
+    return (
+      <App />
+    )
+  }
+})
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <ReactReduxFirebaseProvider {...rrfProps}>
-        <App />
+        <WaitTillAuth />
       </ReactReduxFirebaseProvider>
     </Provider>
   </React.StrictMode>,
